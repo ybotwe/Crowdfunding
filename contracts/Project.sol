@@ -165,7 +165,7 @@ contract Project {
         require(acceptedRequests.length >=  M, "3 or more of the top 5 contributors need to accept withdrawal");
         uint256 totalRaised = currentBalance;
         currentBalance = 0;
-        (bool success, ) = creator.call{value: msg.value}("");
+        (bool success, ) = creator.call{value: totalRaised}("");
         if(success){
             state = State.Funded;
             emit CreatorFunded(creator, totalRaised);

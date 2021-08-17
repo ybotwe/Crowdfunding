@@ -59,12 +59,12 @@ contract('Project', accounts => {
             const previousBalance = await project.currentBalance()
             creator = await project.creator()
             var previousAccBalance = await web3.eth.getBalance(creator);
-            result = await project.withdraw()
+            result = await project.withdraw({from: accounts[0]})
+            console.log(result)
             const currentBalance = await project.currentBalance()
             var currentAccBalance = await web3.eth.getBalance(creator);
-            assert.equal(result.receipt.status, true, "Transaction was not successful")
             assert.isBelow(Number(currentBalance), Number(previousBalance))
-            assert.isAbove(Number(previousAccBalance), Number(currentAccBalance))
+            assert.isAbove(Number(currentAccBalance), Number(previousAccBalance))
         })
 
     })
