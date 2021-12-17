@@ -1,7 +1,7 @@
 {
-  "name": "hodl",
+  "name": "crowdfunding",
   "version": "1.0.0",
-  "description": "A smart contract meant for HODLers ",
+  "description": "A smart contract meant for crowdfunding ",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@openzeppelin/contracts": "^4.1.0",
+    "@truffle/hdwallet-provider": "^1.4.3",
     "babel-polyfill": "6.26.0",
     "babel-preset-env": "1.7.0",
     "babel-preset-es2015": "6.24.1",

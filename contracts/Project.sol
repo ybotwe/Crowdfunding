@@ -114,7 +114,7 @@ contract Project {
         6. If so, we push the address of the sender else we calculate the least contributing member of admins
            and replace it with the msg.sender.
     */
-    function contribute() public inState(State.Fundraising) payable {
+    function contribute() public inState(State.Fundraising) entrancyGuard payable {
         require(msg.sender != creator);
         
         
@@ -142,6 +142,13 @@ contract Project {
                 for(uint i = 0; i < 5; i++){
                     if(contributions[admins[i]] <= msg.value && contributions[admins[i]] == threshold){
                         admins[i] = msg.sender;
+                        threshold = type(uint256).max;
+                    }
+                }
+                for(uint i = 0; i < 5; i++){
+                    uint value = contributions[admins[i]];
+                    if(value < threshold){
+                        threshold = value;
                     }
                 }
             }

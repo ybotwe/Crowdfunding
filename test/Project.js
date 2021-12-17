@@ -17,12 +17,12 @@ contract('Project', accounts => {
             await project.contribute({from: accounts[4], value: web3.utils.toWei('0.4', 'ether')})
             await project.contribute({from: accounts[5], value: web3.utils.toWei('0.5', 'ether')})
             await project.contribute({from: accounts[6], value: web3.utils.toWei('0.6', 'ether')})
-            await project.contribute({from: accounts[7], value: web3.utils.toWei('0.7', 'ether')})
+            await project.contribute({from: accounts[7], value: web3.utils.toWei('1', 'ether')})
 
     
             admins = await project.getAdmins();
             console.log(admins)
-            expect(admins).deep.to.equal([accounts[6], accounts[2], accounts[3], accounts[4], accounts[5]]);
+            expect(admins).deep.to.equal([accounts[6], accounts[7], accounts[3], accounts[4], accounts[5]]);
         })
     
     
