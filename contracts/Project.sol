@@ -140,10 +140,15 @@ contract Project {
         } else {
             if(msg.value > threshold){
                 for(uint i = 0; i < 5; i++){
-                    if(contributions[admins[i]] <= msg.value && contributions[admins[i]] == threshold){
-                        admins[i] = msg.sender;
-                        threshold = type(uint256).max;
+                    if (admins[i] == msg.sender){
+                        return;
+                    } else{
+                        if(contributions[admins[i]] <= msg.value && contributions[admins[i]] == threshold){
+                            admins[i] = msg.sender;
+                            threshold = type(uint256).max;
+                        }
                     }
+                    
                 }
                 for(uint i = 0; i < 5; i++){
                     uint value = contributions[admins[i]];
@@ -231,7 +236,7 @@ contract Project {
     */
     function contains(address userAddress, address[5] memory list) internal pure returns(bool) {
         for(uint i = 0; i < 5; i++){
-            if(userAddress == list[i]){
+            if(list[i] == userAddress){
                 return true;
             }
         }
@@ -242,7 +247,7 @@ contract Project {
       *   @dev Function to approve withdrawal for the project from the top 5 contributors.
     */
     function approveWithdrawal() inState(State.Successful) external {
-        require(contains(msg.sender, admins));
+        require(contains(msg.sender, admins), "User not part of the top 5 contributors");
         acceptedRequests.push(msg.sender);
     }
 
