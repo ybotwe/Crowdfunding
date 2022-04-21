@@ -197,7 +197,7 @@ contract Project {
         uint amountToRefund = contributions[msg.sender];
         contributions[msg.sender] = 0; 
 
-        (bool success, ) = msg.sender.call{value: msg.value}("");
+        (bool success, ) = msg.sender.call{value: amountToRefund}("");
         if (success) {
             currentBalance = currentBalance.sub(amountToRefund);
         } else {
