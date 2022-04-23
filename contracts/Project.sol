@@ -1,8 +1,10 @@
 //SPDX-License-Identifier: ISC
 pragma solidity ^0.8.4;
 
-contract Project {
+import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 
+contract Project {
+    using SafeMath for uint256;
 
     /********************************************************************************************/
     /*                                       DATA VARIABLES                                     */
