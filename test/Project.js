@@ -41,21 +41,6 @@ contract('Project', accounts => {
     
     })
 
-    describe('approveWithdrawal function', () => {
-        it('should add approved admin into the accepted requests array', async () => {
-            admins = await project.getAdmins();
-            console.log(admins);
-            await project.approveWithdrawal({from: accounts[7]});
-            await project.approveWithdrawal({from: accounts[6]});
-            await project.approveWithdrawal({from: accounts[4]});
-            
-            accepted = await project.getAcceptedRequests();
-            console.log(accepted);
-            expect(accepted).deep.to.equal([accounts[7], accounts[6], accounts[4]]);
-        })
-
-
-    })
 
     describe('withdraw function', () => {
         it('should withdraw funds from contract to creator', async () => {

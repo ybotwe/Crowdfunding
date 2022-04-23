@@ -21,12 +21,7 @@ contract Project {
 
     mapping(address => uint256) public contributions;   //Mapping to track the contributors of the project with 
                                                         //the amount contributed.
-
-    address[5] public admins;         //List of top 5 contributors
-    address[] public acceptedRequests; //List of admins who have accepted withdrawal
     uint constant private M = 3;    //Constant number of admins required to accept withdrawal
-    uint256 private index = 0;
-    uint256 private threshold = type(uint256).max;
     uint256 private counter = 1; 
 
 
@@ -131,34 +126,6 @@ contract Project {
             completedAt = block.timestamp;
         }
 
-        if(index < 5 && admins[index] == address(0)){
-            admins[index] = msg.sender;
-            index += 1;
-            if(msg.value < threshold){
-                threshold = msg.value;
-            }
-        } else {
-            if(msg.value > threshold){
-                for(uint i = 0; i < 5; i++){
-                    if (admins[i] == msg.sender){
-                        return;
-                    } else{
-                        if(contributions[admins[i]] <= msg.value && contributions[admins[i]] == threshold){
-                            admins[i] = msg.sender;
-                            threshold = type(uint256).max;
-                        }
-                    }
-                    
-                }
-                for(uint i = 0; i < 5; i++){
-                    uint value = contributions[admins[i]];
-                    if(value < threshold){
-                        threshold = value;
-                    }
-                }
-            }
-        }
-
         emit FundingReceived(msg.sender, msg.value, currentBalance);
     }
 
@@ -172,38 +139,23 @@ contract Project {
         4. Check if call was successful then emit event, if not, reset value of currentBalance
 
     */
-    function withdraw() external inState(State.Successful) onlyCreator entrancyGuard payable returns (bool){
+    function withdraw() external inState(State.Successful) onlyCreator entrancyGuard {
         require(msg.sender == creator, "Only creator can call this function");
-        require(acceptedRequests.length >=  M, "3 or more of the top 5 contributors need to accept withdrawal");
         uint256 totalRaised = currentBalance;
+        creator.transfer(totalRaised);
         currentBalance = 0;
-        (bool success, ) = creator.call{value: totalRaised}("");
-        if(success){
-            state = State.Funded;
-            emit CreatorFunded(creator, totalRaised);
-            return true;
-        } else {
-            currentBalance = totalRaised;
-            return false;
-        }
-       
     }
+
+
     /** 
     * @dev Function to retrieve donated amount when a project expires.
     */
-    function getRefund() external inState(State.Expired) payable returns(bool){
+    function getRefund() external inState(State.Expired) {
         require(contributions[msg.sender] > 0);
 
         uint amountToRefund = contributions[msg.sender];
+        payable(msg.sender).transfer(amountToRefund);
         contributions[msg.sender] = 0; 
-
-        (bool success, ) = msg.sender.call{value: amountToRefund}("");
-        if (success) {
-            currentBalance = currentBalance.sub(amountToRefund);
-        } else {
-            contributions[msg.sender] = amountToRefund;
-        }
-        return success;
     }
 
     /** 
@@ -216,9 +168,7 @@ contract Project {
         uint  deadline,
         uint256  balance, 
         uint256  projectGoal,
-        State currentState,
-        uint256 currentIndex,
-        uint256 thresholdVal
+        State currentState
     ){
         projectStarter = creator;
         projectTitle = title;
@@ -227,44 +177,16 @@ contract Project {
         balance = currentBalance;
         projectGoal = goal;
         currentState = state;
-        currentIndex = index;
-        thresholdVal = threshold;
     }
+
 
     /** 
-      *   @dev Internal Function to check whether item is in a list.
+      *   @dev  Function to check balance of project.
     */
-    function contains(address userAddress, address[5] memory list) internal pure returns(bool) {
-        for(uint i = 0; i < 5; i++){
-            if(list[i] == userAddress){
-                return true;
-            }
-        }
-        return false;
+    function getBalance() public view returns (uint){
+        return address(this).balance;
     }
 
-    /** 
-      *   @dev Function to approve withdrawal for the project from the top 5 contributors.
-    */
-    function approveWithdrawal() inState(State.Successful) external {
-        require(contains(msg.sender, admins), "User not part of the top 5 contributors");
-        acceptedRequests.push(msg.sender);
-    }
-
-    /*
-    * @dev Function to get list of highest contributors
-    */
-    function getAdmins() external view returns(address[5] memory){
-        return admins;
-    }
-
-
-    /*
-    * @dev Function to get list approved withdrawal requests
-    */
-    function getAcceptedRequests() external view returns(address[] memory){
-        return acceptedRequests;
-    }
 
 
 }
